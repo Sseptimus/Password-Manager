@@ -1,1 +1,1 @@
-# MAGpS
+# Password Generator
