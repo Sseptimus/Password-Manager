@@ -32,7 +32,7 @@ current_page = 1
 total_pages = 0
 
 
-def setup_manager():
+def setup_manager(): #Sets up the main password manager window and places all the elements on screen
     global manager
     manager = Toplevel(login_page)
     manager.title("Password Manager")
@@ -57,7 +57,7 @@ def setup_manager():
     previous_button.place(y=440, x=2)
 
 
-def new_password():
+def new_password(): #Creates window for adding new password
     global generate_button, manual_button, account_input, username_input, password_input, new_window
     new_window = Toplevel(manager)
     new_window.grab_set()
@@ -92,7 +92,7 @@ def new_password():
     done_button.place(x=25, y=325)
 
 
-def next_page():
+def next_page():# moves page across one on main manager window
     global current_page, total_pages
     if current_page == total_pages:
         return
@@ -115,7 +115,7 @@ def next_page():
             i.place(x=1000)
 
 
-def previous_page():
+def previous_page(): # moves page back one on main manager window
     global current_page, total_pages
     if current_page == 1:
         return
@@ -137,23 +137,8 @@ def previous_page():
         else:
             i.place(x=1000)
 
-def manuel_entry():
-    global password_input, current_page
-    password_input = Entry(new_window, width=30, font=(
-        "Arial", 15), background="#0e0118", foreground="#ffffff")
-    password_input.place(x=25, y=275)
-    done_button = Button(new_window, text="Add password", font=(
-        "Arial", 15), background="#0e0118", foreground="#ffffff", command=new_password_entry)
-    done_button.place(x=25, y=325)
-    current_page = 1
-    for i in password_labels:
-        i.place_forget()
-    for i in account_labels:
-        i.place_forget()
-    set_tabs()
 
-
-def set_tabs():
+def set_tabs(): #places all the main elements where they need to be on the pages, either on or off screen
     global total_pages
     total_pages = math.ceil(len(passwords)/3)
     for i in passwords:
@@ -177,7 +162,7 @@ def set_tabs():
                 password_labels[-1].place(x=490-36,
                                           y=155+passwords.index(i)*100)
             else:
-                password_labels[-1].place(x=490-len(i)* 5, y=155+passwords.index(i)*100)
+                password_labels[-1].place(x=490-len(i) * 5, y=155+passwords.index(i)*100)
         else:
             tabs.append(Label(manager, text="Text", width=700,
                         height=100, image=tabBackground, borderwidth=0))
@@ -202,7 +187,7 @@ def set_tabs():
                                           y=155+(passwords.index(i)-(total_pages*3))*100)
 
 
-def new_password_entry():
+def new_password_entry(): #Saves new password and updates all lists with new info
     global total_pages
     if password_input.get() == "":
         return
@@ -235,7 +220,7 @@ def new_password_entry():
     total_pages = math.ceil(len(passwords)/3)
 
 
-def popup(location):
+def popup(location): #opens a popup window with the info chosen
 
     info_window = Toplevel(manager)
     info_window.grab_set()
@@ -267,7 +252,7 @@ def popup(location):
     password_info.place(x=25, y=245)
 
 
-def login():
+def login_setup(): #Sets up the login window, placing all elements on screen
     global password_entry, username_entry
     login_page.title('Password Manager')
     login_page.configure(background='black')
@@ -294,7 +279,7 @@ def login():
     login_page.bind("<Escape>", lambda event: login_page.destroy())
 
 
-def login_check():
+def login_check(): # checks if username and password are correct and opens main manager window
     username = username_entry.get()
     password = password_entry.get()
     if username.lower() == "admin" and password == "password":
@@ -302,6 +287,6 @@ def login_check():
         setup_manager()
 
 
-if __name__ == "__main__":
-    login()
+if __name__ == "__main__": # begins program
+    login_setup()
     login_page.mainloop()
