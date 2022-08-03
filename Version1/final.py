@@ -4,6 +4,7 @@ from random import *
 import json
 import math
 from functools import partial
+from time import sleep
 
 login_page = tk.Tk()
 login_wallpapers = [r"Password-Generator\Assets\login_wallpapers\cave_edited.png",
@@ -15,9 +16,10 @@ tabBackground = PhotoImage(
 new_password_Background = PhotoImage(
     file=r"Password-Generator\Assets\Element backgrounds\new_password.png")
 backGroundImage = PhotoImage(file=choice(login_wallpapers))
-
+# creates image variables
 with open('Password-Generator\Version1\Password-Generator-Data.json', 'r') as f:
     data = json.load(f)
+# opens and saves json file into program
 
 passwords = data[0]
 accounts = data[1]
@@ -30,9 +32,11 @@ tabs = []
 show_buttons = []
 current_page = 1
 total_pages = 0
+# sets up main global variables
 
 
-def setup_manager(): #Sets up the main password manager window and places all the elements on screen
+def setup_manager():  
+# Sets up the main password manager window and places all the elements on screen, does not return
     global manager
     manager = Toplevel(login_page)
     manager.title("Password Manager")
@@ -57,7 +61,8 @@ def setup_manager(): #Sets up the main password manager window and places all th
     previous_button.place(y=440, x=2)
 
 
-def new_password(): #Creates window for adding new password
+def new_password(): 
+    # Creates window for adding new password, does not return
     global generate_button, manual_button, account_input, username_input, password_input, new_window
     new_window = Toplevel(manager)
     new_window.grab_set()
@@ -92,57 +97,48 @@ def new_password(): #Creates window for adding new password
     done_button.place(x=25, y=325)
 
 
-def next_page():# moves page across one on main manager window
+def next_page(): 
+    # moves page across one on main manager window, does not return
     global current_page, total_pages
     if current_page == total_pages:
         return
     current_page += 1
-    for i in password_labels:
-        if password_labels.index(i) >= current_page*3-3 and password_labels.index(i) <= current_page*3-1:
-            i.place(x=490-36, y=155 +
-                    (password_labels.index(i)-((current_page-1)*3))*100)
-        else:
-            i.place(x=1000, y=1000)
-    for i in account_labels:
-        if account_labels.index(i) >= current_page*3-3 and account_labels.index(i) <= current_page*3-1:
-            i.place(x=20, y=155+(account_labels.index(i)-((current_page-1)*3))*100)
-        else:
-            i.place(x=1000)
-    for i in view_buttons:
-        if view_buttons.index(i) >= current_page*3-3 and view_buttons.index(i) <= current_page*3-1:
-            i.place(x=540, y=155+(view_buttons.index(i)-((current_page-1)*3))*100)
-        else:
-            i.place(x=1000)
+    update_screen()
 
 
-def previous_page(): # moves page back one on main manager window
+def previous_page():  # moves page back one on main manager window
     global current_page, total_pages
     if current_page == 1:
         return
     current_page -= 1
+    update_screen()
+
+def update_screen():  
+# updates the screen with the current page, moving all of the passwords and account labels to the correct place
+    # loops through all of the hidden passwords and moves them so only current page is shown
     for i in password_labels:
         if password_labels.index(i) >= current_page*3-3 and password_labels.index(i) <= current_page*3-1:
             i.place(x=490-36, y=155 +
                     (password_labels.index(i)-((current_page-1)*3))*100)
         else:
             i.place(x=1000)
+    # loops through all of the account labels and moves them so only the current page is shown
     for i in account_labels:
         if account_labels.index(i) >= current_page*3-3 and account_labels.index(i) <= current_page*3-1:
             i.place(x=20, y=155+(account_labels.index(i)-((current_page-1)*3))*100)
         else:
             i.place(x=1000)
+    # loops through all of the view password buttons and moves them so only the current page is shown
     for i in view_buttons:
         if view_buttons.index(i) >= current_page*3-3 and view_buttons.index(i) <= current_page*3-1:
             i.place(x=540, y=155+(view_buttons.index(i)-((current_page-1)*3))*100)
         else:
             i.place(x=1000)
-
-
-def set_tabs(): #places all the main elements where they need to be on the pages, either on or off screen
+def set_tabs():  
+# places all the main elements where they need to be on the pages, either on or off screen
     global total_pages
     total_pages = math.ceil(len(passwords)/3)
-    for i in passwords:
-
+    for i in passwords:  # loops through the passwords and creats bars on the screen with all emlements needed e.g. view password button, hidden password and account name
         if passwords.index(i) < 3:
             tabs.append(Label(manager, text="Text", width=700,
                         height=100, image=tabBackground, borderwidth=0))
@@ -162,7 +158,8 @@ def set_tabs(): #places all the main elements where they need to be on the pages
                 password_labels[-1].place(x=490-36,
                                           y=155+passwords.index(i)*100)
             else:
-                password_labels[-1].place(x=490-len(i) * 5, y=155+passwords.index(i)*100)
+                password_labels[-1].place(x=490-len(i)
+                                          * 5, y=155+passwords.index(i)*100)
         else:
             tabs.append(Label(manager, text="Text", width=700,
                         height=100, image=tabBackground, borderwidth=0))
@@ -187,8 +184,9 @@ def set_tabs(): #places all the main elements where they need to be on the pages
                                           y=155+(passwords.index(i)-(total_pages*3))*100)
 
 
-def new_password_entry(): #Saves new password and updates all lists with new info
-    global total_pages
+def new_password_entry():  
+# Saves new password and updates all lists with new info
+    global total_pages, current_page
     if password_input.get() == "":
         return
     elif account_input.get() == "":
@@ -214,13 +212,15 @@ def new_password_entry(): #Saves new password and updates all lists with new inf
         password_labels.append(Label(manager, text=len(password_input.get(
         ))*("*"), font=("Arial", 20), fg="#ffffff", background="#0e0118"))
     new_window.destroy()
-    view_buttons.append(Button(manager, command=partial(popup, len(passwords)-1), text="View Password", font=("Arial", 15), background="#0e0118", foreground="#ffffff"))
-    view_buttons[-1].place(
-        x=540, y=155+(len(passwords)-1-(total_pages*3))*100)
+    view_buttons.append(Button(manager, command=partial(popup, len(
+        passwords)-1), text="View Password", font=("Arial", 15), background="#0e0118", foreground="#ffffff"))
     total_pages = math.ceil(len(passwords)/3)
+    current_page = 1
+    update_screen()
 
 
-def popup(location): #opens a popup window with the info chosen
+def popup(location):  
+# opens a popup window with the info chosen
 
     info_window = Toplevel(manager)
     info_window.grab_set()
@@ -252,7 +252,8 @@ def popup(location): #opens a popup window with the info chosen
     password_info.place(x=25, y=245)
 
 
-def login_setup(): #Sets up the login window, placing all elements on screen
+def login_setup():  
+    # Sets up the login window, placing all elements on screen
     global password_entry, username_entry
     login_page.title('Password Manager')
     login_page.configure(background='black')
@@ -279,14 +280,20 @@ def login_setup(): #Sets up the login window, placing all elements on screen
     login_page.bind("<Escape>", lambda event: login_page.destroy())
 
 
-def login_check(): # checks if username and password are correct and opens main manager window
+def login_check():  
+# checks if username and password are correct and opens main manager window
+    global incorrect_password
     username = username_entry.get()
     password = password_entry.get()
     if username.lower() == "admin" and password == "password":
         login_page.withdraw()
         setup_manager()
+    else:
+        incorrect_password = Label(login_page, text="Incorrect Username or Password", bg='red', fg='white', font=('Arial', 20))
+        incorrect_password.place(x=100, y=380)
+        incorrect_password.after(2000, lambda: incorrect_password.destroy())
 
 
-if __name__ == "__main__": # begins program
+if __name__ == "__main__":  # begins program
     login_setup()
     login_page.mainloop()
